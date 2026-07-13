@@ -5,16 +5,18 @@ Thumbs.db
 # ==========================================
 # 阶段 1 (Stage 1) 忽略规则
 # ==========================================
-# 忽略 QGIS 产生的本地临时备份和锁定文件
+# 忽略 QGIS 和 excel 产生的本地临时备份和锁定文件
 *.qgz~
 *.qgd
 *.bak
 .qgis/
+~$*.xlsx
 
 # 忽略阶段 1 的本地原始大数据（防止超过 100MB 限制报错）
 # 组员通过网盘下载后，手动放入该目录下即可
 stage1_data_cleaning/data/raw/
-
+stage1_data_cleaning/Toronto_data/boundary/lcsd000b21a_e.zip
+stage1_data_cleaning/Toronto_data/boundary/lcsd000b21a_e
 
 # ==========================================
 # 阶段 2 (Stage 2) 忽略规则
@@ -28,3 +30,4 @@ env/
 
 # 忽略大型 AI 模型权重文件（如果大于 50MB，建议通过网盘共享，不传 GitHub）
 stage2_ai_modeling/models/
+

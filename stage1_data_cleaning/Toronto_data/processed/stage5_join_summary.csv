@@ -1,0 +1,2 @@
+﻿boundary_count,indicator_count,matched_count,unmatched_boundary_count,unmatched_indicator_count,match_rate_pct,join_field_boundary,join_field_indicators,join_relationship
+585,585,585,0,0,100.00,DGUID,DGUID,one_to_one

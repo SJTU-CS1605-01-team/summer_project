@@ -1,0 +1,151 @@
+{
+  "qgis_version": "3.44.12-Solothurn",
+  "boundary_count": 585,
+  "indicator_count": 585,
+  "matched_count": 585,
+  "unmatched_boundary_count": 0,
+  "unmatched_indicator_count": 0,
+  "match_rate_pct": 100.0,
+  "unmatched_boundary_ids": [],
+  "unmatched_indicator_ids": [],
+  "coverage": [
+    {
+      "indicator": "population_2021",
+      "non_missing_count": 585,
+      "missing_count": 0,
+      "coverage_pct": "100.00"
+    },
+    {
+      "indicator": "population_density_km2",
+      "non_missing_count": 585,
+      "missing_count": 0,
+      "coverage_pct": "100.00"
+    },
+    {
+      "indicator": "age_65_plus_pct",
+      "non_missing_count": 585,
+      "missing_count": 0,
+      "coverage_pct": "100.00"
+    },
+    {
+      "indicator": "average_household_size",
+      "non_missing_count": 583,
+      "missing_count": 2,
+      "coverage_pct": "99.66"
+    },
+    {
+      "indicator": "median_total_income_2020",
+      "non_missing_count": 583,
+      "missing_count": 2,
+      "coverage_pct": "99.66"
+    },
+    {
+      "indicator": "low_income_lim_at_pct",
+      "non_missing_count": 583,
+      "missing_count": 2,
+      "coverage_pct": "99.66"
+    },
+    {
+      "indicator": "renter_households_pct",
+      "non_missing_count": 583,
+      "missing_count": 2,
+      "coverage_pct": "99.66"
+    },
+    {
+      "indicator": "shelter_cost_30pct_plus_pct",
+      "non_missing_count": 583,
+      "missing_count": 2,
+      "coverage_pct": "99.66"
+    },
+    {
+      "indicator": "bachelor_or_higher_age25_64_pct",
+      "non_missing_count": 583,
+      "missing_count": 2,
+      "coverage_pct": "99.66"
+    },
+    {
+      "indicator": "unemployment_rate_pct",
+      "non_missing_count": 583,
+      "missing_count": 2,
+      "coverage_pct": "99.66"
+    }
+  ],
+  "density_difference": {
+    "count": 585,
+    "mean": -414.8641597503872,
+    "max_abs": 3613.893778853686
+  },
+  "density_ranges": [
+    {
+      "lower": 82.9988,
+      "upper": 5652.3462,
+      "label": "83 – 5,652"
+    },
+    {
+      "lower": 5652.3462,
+      "upper": 12075.7529,
+      "label": "5,652 – 12,076"
+    },
+    {
+      "lower": 12075.7529,
+      "upper": 22529.0648,
+      "label": "12,076 – 22,529"
+    },
+    {
+      "lower": 22529.0648,
+      "upper": 37593.9962,
+      "label": "22,529 – 37,594"
+    },
+    {
+      "lower": 37593.9962,
+      "upper": 73931.4062,
+      "label": "37,594 – 73,931"
+    }
+  ],
+  "low_income_ranges": [
+    {
+      "lower": 3.6,
+      "upper": 8.6,
+      "label": "3.6 – 8.6"
+    },
+    {
+      "lower": 8.6,
+      "upper": 13.6,
+      "label": "8.6 – 13.6"
+    },
+    {
+      "lower": 13.6,
+      "upper": 19.5,
+      "label": "13.6 – 19.5"
+    },
+    {
+      "lower": 19.5,
+      "upper": 27.3,
+      "label": "19.5 – 27.3"
+    },
+    {
+      "lower": 27.3,
+      "upper": 45.0,
+      "label": "27.3 – 45.0"
+    }
+  ],
+  "outputs": {
+    "toronto_csv": "C:\\Users\\awaiting\\Desktop\\summer_project\\stage1_data_cleaning\\Toronto_data\\processed\\toronto_indicators_2021.csv",
+    "summary_csv": "C:\\Users\\awaiting\\Desktop\\summer_project\\stage1_data_cleaning\\Toronto_data\\processed\\stage5_join_summary.csv",
+    "coverage_csv": "C:\\Users\\awaiting\\Desktop\\summer_project\\stage1_data_cleaning\\Toronto_data\\processed\\stage5_indicator_coverage.csv",
+    "gpkg": "C:\\Users\\awaiting\\Desktop\\summer_project\\stage1_data_cleaning\\Toronto_data\\processed\\city_tract_indicators.gpkg",
+    "project": "C:\\Users\\awaiting\\Desktop\\summer_project\\stage1_data_cleaning\\qgis\\toronto_stage5_6.qgz",
+    "layouts": [
+      {
+        "name": "Map_1_Population_Density",
+        "png": "C:\\Users\\awaiting\\Desktop\\summer_project\\stage1_data_cleaning\\maps\\toronto_population_density_2021_preview.png",
+        "pdf": "C:\\Users\\awaiting\\Desktop\\summer_project\\stage1_data_cleaning\\maps\\toronto_population_density_2021_preview.pdf"
+      },
+      {
+        "name": "Map_2_Low_Income",
+        "png": "C:\\Users\\awaiting\\Desktop\\summer_project\\stage1_data_cleaning\\maps\\toronto_low_income_2020_preview.png",
+        "pdf": "C:\\Users\\awaiting\\Desktop\\summer_project\\stage1_data_cleaning\\maps\\toronto_low_income_2020_preview.pdf"
+      }
+    ]
+  }
+}

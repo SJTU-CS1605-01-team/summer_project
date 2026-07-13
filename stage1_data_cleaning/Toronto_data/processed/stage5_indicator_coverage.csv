@@ -1,0 +1,11 @@
+﻿indicator,non_missing_count,missing_count,coverage_pct
+population_2021,585,0,100.00
+population_density_km2,585,0,100.00
+age_65_plus_pct,585,0,100.00
+average_household_size,583,2,99.66
+median_total_income_2020,583,2,99.66
+low_income_lim_at_pct,583,2,99.66
+renter_households_pct,583,2,99.66
+shelter_cost_30pct_plus_pct,583,2,99.66
+bachelor_or_higher_age25_64_pct,583,2,99.66
+unemployment_rate_pct,583,2,99.66
