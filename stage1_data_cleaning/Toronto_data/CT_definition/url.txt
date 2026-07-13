@@ -1,0 +1,6 @@
+page_name: Dictionary, Census of Population, 2021 — Census tract (CT)
+source_url: https://www12.statcan.gc.ca/census-recensement/2021/ref/dict/az/definition-eng.cfm?ID=geo013
+definition_year: 2021
+access_date: 2026-07-13
+source_organization: Statistics Canada
+purpose: Official definition, population scale, coverage, stability and naming rules for Canadian Census Tracts.

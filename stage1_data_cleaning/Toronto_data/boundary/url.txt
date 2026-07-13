@@ -1,0 +1,19 @@
+page_name: 2021 Census — Boundary files
+source_url: https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/index2021-eng.cfm?Year=21
+download_url: Through the official page, manually select Census tracts; no stable direct file URL was retained because the download request is dynamically generated.
+selection_steps: English > Cartographic Boundary Files > Statistical boundaries > Census tracts > Shapefile > Statistics Canada Lambert
+download_file: lct_000b21a_e.zip
+file_size_bytes: 13403271
+data_year: 2021
+access_date: 2026-07-13
+source_organization: Statistics Canada
+file_type: Census Tract Cartographic Boundary File, Shapefile
+crs_name: NAD83 / Statistics Canada Lambert
+epsg: 3347
+coordinate_unit: metre
+primary_unique_id: DGUID
+alternate_unique_id: CTUID
+area_field: LANDAREA (square kilometres)
+license: Statistics Canada Open Licence
+license_url: https://www.statcan.gc.ca/en/terms-conditions/open-licence
+coverage_note: Canada-wide Census Tract boundaries; not filtered to Toronto City. A later stage must use the Toronto City boundary to select city CTs.

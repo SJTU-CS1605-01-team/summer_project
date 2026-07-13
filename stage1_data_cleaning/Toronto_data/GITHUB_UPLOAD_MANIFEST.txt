@@ -1,0 +1,134 @@
+Toronto 2021 Census Tract项目：GitHub上传结构与文件位置
+=========================================================
+
+Git仓库根目录
+------------
+/Users/william/Documents/cs1605
+
+建议直接上传的仓库结构
+--------------------
+cs1605/
+├── .gitignore
+└── Toronto_data/
+    ├── README.md
+    ├── quality_report.md
+    ├── STAGE1_3_RESPONSIBILITY_ANSWERS.txt
+    ├── GITHUB_UPLOAD_MANIFEST.txt
+    ├── process_ct_indicators.py
+    ├── make_indicator_evidence.py
+    ├── build_workbooks.py
+    ├── indicator_inventory.xlsx
+    ├── data_dictionary.xlsx
+    ├── CT_definition/
+    │   ├── tract_like_selection.md
+    │   ├── url.txt
+    │   └── definition_page.png
+    ├── boundary/
+    │   ├── url.txt
+    │   ├── boundary_download_page.png
+    │   ├── lct_000b21a_e.zip
+    │   └── lct_000b21a_e/
+    │       ├── lct_000b21a_e.shp
+    │       ├── lct_000b21a_e.shx
+    │       ├── lct_000b21a_e.dbf
+    │       ├── lct_000b21a_e.prj
+    │       └── lct_000b21a_e.xml
+    ├── indicators/
+    │   ├── url.txt
+    │   └── indicator_download_page.png
+    ├── processed/
+    │   ├── canada_ct_10_indicators_2021.csv
+    │   └── processing_report.md
+    └── evidence/
+        └── indicator_data_sample.png
+
+每个上传文件的绝对位置和用途
+--------------------------
+1. /Users/william/Documents/cs1605/.gitignore
+   用途：阻止249MB指标ZIP、2.63GB解压目录、缓存、临时SQLite和隐藏JSON进入Git。
+
+2. /Users/william/Documents/cs1605/Toronto_data/README.md
+   用途：项目入口、数据来源、运行方法、阶段验收和后续QGIS交接。
+
+3. /Users/william/Documents/cs1605/Toronto_data/quality_report.md
+   用途：边界与指标质量、缺失、年份、抽样和职责边界说明。
+
+4. /Users/william/Documents/cs1605/Toronto_data/STAGE1_3_RESPONSIBILITY_ANSWERS.txt
+   用途：逐题回答11个问题，标注阶段1—3职责范围及证据位置。
+
+5. /Users/william/Documents/cs1605/Toronto_data/GITHUB_UPLOAD_MANIFEST.txt
+   用途：上传结构、绝对位置和排除文件清单。
+
+6. /Users/william/Documents/cs1605/Toronto_data/process_ct_indicators.py
+   用途：从官方ZIP低内存流式生成全国CT十指标表并执行质量验证。
+
+7. /Users/william/Documents/cs1605/Toronto_data/make_indicator_evidence.py
+   用途：从处理后CSV重新生成真实数据证据图。
+
+8. /Users/william/Documents/cs1605/Toronto_data/build_workbooks.py
+   用途：使用经用户授权的openpyxl生成并验证两个XLSX交付物。
+
+9. /Users/william/Documents/cs1605/Toronto_data/indicator_inventory.xlsx
+   用途：10项指标、来源信息和质量汇总；含3个工作表，已视觉检查。
+
+10. /Users/william/Documents/cs1605/Toronto_data/data_dictionary.xlsx
+    用途：处理后CSV全部16个字段的数据字典，已视觉检查。
+
+11. /Users/william/Documents/cs1605/Toronto_data/CT_definition/tract_like_selection.md
+   用途：阶段1单元选择结论、覆盖范围、编码和面积尺度说明。
+
+12. /Users/william/Documents/cs1605/Toronto_data/CT_definition/url.txt
+   用途：官方CT定义页面元数据。
+
+13. /Users/william/Documents/cs1605/Toronto_data/CT_definition/definition_page.png
+    用途：官方CT定义页面证据图。
+
+14. /Users/william/Documents/cs1605/Toronto_data/boundary/url.txt
+    用途：边界官方来源、下载选择、文件名、CRS、编码和许可证。
+
+15. /Users/william/Documents/cs1605/Toronto_data/boundary/boundary_download_page.png
+    用途：官方边界下载选择页面证据图。
+
+16. /Users/william/Documents/cs1605/Toronto_data/boundary/lct_000b21a_e.zip
+    用途：Statistics Canada 2021 Canada-wide CT Cartographic Boundary File原始ZIP，约12.78MiB。
+
+17. /Users/william/Documents/cs1605/Toronto_data/boundary/lct_000b21a_e/
+    用途：完整Shapefile组件；最大单文件SHP约27.1MiB，低于GitHub 100MB单文件限制。
+
+18. /Users/william/Documents/cs1605/Toronto_data/indicators/url.txt
+    用途：原始Census Profile指标下载来源、动态下载说明和文件元数据。
+
+19. /Users/william/Documents/cs1605/Toronto_data/indicators/indicator_download_page.png
+    用途：官方指标下载页面证据图。
+
+20. /Users/william/Documents/cs1605/Toronto_data/processed/canada_ct_10_indicators_2021.csv
+    用途：6,247行Canada-wide CT十指标宽表，约702KiB。
+
+21. /Users/william/Documents/cs1605/Toronto_data/processed/processing_report.md
+    用途：流式处理、ID/列映射、缺失、范围、重复和抽查记录。
+
+22. /Users/william/Documents/cs1605/Toronto_data/evidence/indicator_data_sample.png
+    用途：处理后CSV前10行的清晰真实数据证据图。
+
+本地保留但不上传的文件
+--------------------
+1. Toronto_data/indicators/98-401-X2021007_eng_CSV.zip
+   249,720,408 bytes，超过GitHub普通仓库100MB单文件限制；通过官方页面重新下载。
+
+2. Toronto_data/indicators/98-401-X2021007_eng_CSV/
+   包含约2.63GB主CSV；由.gitignore排除。
+
+3. Toronto_data/processed/.*.json
+   处理过程隐藏中间文件；由.gitignore排除。
+
+4. __pycache__/、*.pyc、.DS_Store、*.sqlite3、*.tmp
+   缓存和临时文件；由.gitignore排除。
+
+5. 各目录原中文名“截屏*.png”
+   本地原始截图予以保留；Git上传标准化命名副本，避免重复。
+
+上传前检查
+----------
+- 不执行git add、git commit或git push；本清单仅说明可上传结构。
+- indicator_inventory.xlsx和data_dictionary.xlsx已生成并完成重新读取与视觉检查，可加入提交。
+- 不应上传任何阶段4以后虚构成果；当前没有city_tract_indicators.gpkg、连接报告、专题地图或神经网络结论。

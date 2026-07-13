@@ -1,0 +1,104 @@
+Toronto 2021 Census Tract项目：阶段1—3职责问题答案与证据位置
+================================================================
+
+项目根目录：/Users/william/Documents/cs1605
+数据目录：/Users/william/Documents/cs1605/Toronto_data
+整理日期：2026-07-13
+
+职责边界
+--------
+阶段1—3负责：确定tract-like空间单元、取得并核验官方边界、收集并整理同尺度指标。
+阶段4以后负责：Toronto City空间筛选、QGIS几何检查、实际属性连接、匹配率、派生指标、地图和AI应用判断。
+因此，下列11题全部列出；属于阶段1—3的题目给出正式答案，不属于本阶段的题目明确标记为待后续完成，避免伪造结果。
+
+1. 该国最合适的 tract-like 单元是什么？为什么不用更粗行政区？
+【职责范围】阶段1，已回答。
+【答案】Canada最合适的tract-like单元是2021 Census tract（CT）。CT是小型、相对稳定的统计地理单元，通常人口2,500—7,500人，推荐平均约5,000人，直接承载人口、收入、住房、教育和就业等指标。CMA范围过大且Toronto CMA包含Toronto City以外地区；Census Subdivision大致对应城市或市镇，无法呈现Toronto内部差异；Census Division更粗。因此CT最适合城市内部社会经济差异分析。
+【证据位置】
+- /Users/william/Documents/cs1605/Toronto_data/CT_definition/tract_like_selection.md
+- /Users/william/Documents/cs1605/Toronto_data/CT_definition/url.txt
+- /Users/william/Documents/cs1605/Toronto_data/CT_definition/definition_page.png
+
+2. 该单元是统计区、普查区还是行政区？是否全国统一覆盖？
+【职责范围】阶段1，已回答。
+【答案】CT是Statistics Canada划定的普查统计区/统计地理单元，不是行政区。它不覆盖加拿大全部国土，只设置在Census Metropolitan Areas以及符合条件的Census Agglomerations。Toronto属于有CT覆盖的CMA，但Toronto CMA不等于Toronto City。Toronto City的2021 CSD ID为3520005；现阶段不能据此或按535前缀把整个CMA称为Toronto City。
+【证据位置】
+- /Users/william/Documents/cs1605/Toronto_data/CT_definition/tract_like_selection.md
+- /Users/william/Documents/cs1605/Toronto_data/README.md
+
+3. Shapefile 的年份、CRS 和唯一编码是什么？
+【职责范围】阶段2，已回答并验证。
+【答案】年份为2021；产品为2021 Census Tract Cartographic Boundary File；CRS由PRJ读取为NAD83 Statistics Canada Lambert，通常对应EPSG:3347，坐标单位metre。主要唯一编码为DGUID，备用唯一编码为CTUID。SHP几何、SHX索引和DBF记录均为6,247；DGUID和CTUID均无重复。LANDAREA表示陆地面积，单位平方公里。
+【证据位置】
+- /Users/william/Documents/cs1605/Toronto_data/boundary/url.txt
+- /Users/william/Documents/cs1605/Toronto_data/boundary/boundary_download_page.png
+- /Users/william/Documents/cs1605/Toronto_data/boundary/lct_000b21a_e/lct_000b21a_e.prj
+- /Users/william/Documents/cs1605/Toronto_data/boundary/lct_000b21a_e/lct_000b21a_e.dbf
+- /Users/william/Documents/cs1605/Toronto_data/quality_report.md
+
+4. 经济社会指标是否发布在同一空间层级？
+【职责范围】阶段3，已回答并验证。
+【答案】是。所选10个指标的原始GEO_LEVEL均严格等于Census tract，与2021 CT边界处在同一空间层级。没有把CMA、市级或省级数据下推到CT，也没有使用disaggregate。
+【证据位置】
+- /Users/william/Documents/cs1605/Toronto_data/processed/canada_ct_10_indicators_2021.csv
+- /Users/william/Documents/cs1605/Toronto_data/processed/processing_report.md
+- /Users/william/Documents/cs1605/Toronto_data/quality_report.md
+- /Users/william/Documents/cs1605/Toronto_data/evidence/indicator_data_sample.png
+
+5. 哪些指标可以直接连接，哪些只能标记为 partial/coarser_level/missing？
+【职责范围】阶段3，已回答。
+【答案】10个指标全部是Statistics Canada正式发布的CT级指标，join_method均为direct_join，整体quality_flag均为available；没有任何一个被标记为coarser_level或需要disaggregate。也没有指标整体标记为partial。需要区分的是：4项住房/教育/就业指标属于25% sample data，另外6项主要属于100% data；每个指标仍可能在少量CT上因官方抑制、不适用或质量限制而缺失。
+
+非缺失/缺失/覆盖率：
+- population_2021：6,240 / 7 / 99.9%
+- population_density_km2：6,240 / 7 / 99.9%
+- age_65_plus_pct：6,166 / 81 / 98.7%
+- average_household_size：6,161 / 86 / 98.6%
+- median_total_income_2020：6,100 / 147 / 97.6%
+- low_income_lim_at_pct：6,100 / 147 / 97.6%
+- renter_households_pct：6,158 / 89 / 98.6%
+- shelter_cost_30pct_plus_pct：6,099 / 148 / 97.6%
+- bachelor_or_higher_age25_64_pct：6,158 / 89 / 98.6%
+- unemployment_rate_pct：6,158 / 89 / 98.6%
+
+【证据位置】
+- /Users/william/Documents/cs1605/Toronto_data/processed/processing_report.md
+- /Users/william/Documents/cs1605/Toronto_data/quality_report.md
+- /Users/william/Documents/cs1605/Toronto_data/processed/canada_ct_10_indicators_2021.csv
+
+6. Shapefile 和指标表通过什么字段连接？是否需要清洗前导零或拼接编码？
+【职责范围】阶段3，已回答；实际连接属于阶段5，尚未执行。
+【答案】首选连接字段为DGUID，边界与指标表均已提供完整DGUID，不需要另行拼接编码。DGUID必须作为文本处理。指标表ALT_GEO_CODE在CT层级对应边界CTUID，可作辅助核对；两者也必须作为文本处理以保留前导零和小数格式。当前数据不需要通过535前缀或其他片段自行构造ID。
+【证据位置】
+- /Users/william/Documents/cs1605/Toronto_data/README.md
+- /Users/william/Documents/cs1605/Toronto_data/quality_report.md
+- /Users/william/Documents/cs1605/Toronto_data/process_ct_indicators.py
+
+7. 连接匹配率是多少？未匹配区域有哪些、为什么？
+【职责范围】不属于阶段1—3；阶段5完成。
+【当前可答内容】本阶段没有执行Toronto City筛选或边界—指标属性连接，因此没有合法的连接匹配率和未匹配区域清单。不能用全国DGUID唯一性代替实际连接匹配率。
+【后续证据位置】阶段5应生成连接报告和city_tract_indicators.gpkg后补充。
+
+8. QGIS 中计算了什么派生指标？
+【职责范围】不属于阶段1—3；阶段4—6完成。
+【当前可答内容】本阶段未操作QGIS，也未计算派生指标。现有10项均直接取自Census Profile，不是本项目派生值。
+
+9. 两张专题地图采用什么分级方法？反映了什么空间现象？
+【职责范围】不属于阶段1—3；阶段6完成。
+【当前可答内容】本阶段没有制作专题地图，因此不能填写分级方法或空间现象结论。
+
+10. 当前最大的困难是什么？后续预计还能完成哪些指标？
+【职责范围】当前困难可由阶段1—3回答；后续实现由后续阶段决定。
+【答案】数据层面的主要困难是：原始Census Profile长表约2.63GB，必须流式处理；CT并非全国连续覆盖；Toronto CMA不能代替Toronto City；25%抽样指标和官方抑制会产生缺失。标准工作簸运行时缺失的问题已在用户明确授权后通过openpyxl替代方案解决，两个XLSX均已生成和视觉检查。下一阶段可在完成Toronto City筛选后补充城市CT数量、LANDAREA面积统计、连接匹配率；如项目需要扩展指标，可继续从同一CT级Census Profile筛选通勤方式、移民身份、语言、职业、住房类型和家庭结构等正式发布指标，但必须逐项记录ID、样本类型、缺失和年份。
+【证据位置】
+- /Users/william/Documents/cs1605/Toronto_data/README.md
+- /Users/william/Documents/cs1605/Toronto_data/quality_report.md
+- /Users/william/Documents/cs1605/Toronto_data/processed/processing_report.md
+
+11. 最终数据是否适合进入神经网络应用阶段？
+【职责范围】不属于阶段1—3；应在阶段7根据完整城市数据、地图和质量评级判断。
+【当前可答内容】现在不能作最终判断。当前数据仍是Canada-wide CT表，尚未筛选Toronto City、未执行边界连接、未报告匹配率，也未完成针对建模的样本量、空间自相关、标签变量、缺失机制和验证策略评估。
+
+阶段1—3结论
+--------------
+研究单元、全国CT边界、10个CT级指标、指标清单和数据字典已经核验并可交接。Toronto City筛选、连接、匹配率、派生指标、地图和神经网络判断必须由后续阶段完成。

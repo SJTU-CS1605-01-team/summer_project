@@ -1,0 +1,16 @@
+page_name: Census Profile, 2021 Census of Population — Download files
+source_url: https://www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/details/download-telecharger.cfm?DGUIDlist=2021A000210&GENDERlist=1&HEADERlist=0&Lang=E&STATISTIClist=1%2C4
+download_url: Through the official page, manually select the Census tract comprehensive CSV; no stable direct file URL was retained because the download endpoint is dynamically generated.
+selection_steps: Comprehensive download files > Census metropolitan areas (CMAs), tracted census agglomerations (CAs) and census tracts (CTs) > CSV > English
+download_file: 98-401-X2021007_eng_CSV.zip
+file_size_bytes: 249720408
+internal_data_file: 98-401-X2021007_English_CSV_data.csv
+internal_data_file_size_bytes: 2634464532
+product_year: 2021
+access_date: 2026-07-13
+source_organization: Statistics Canada
+source_product: Census Profile, 2021 Census of Population
+original_geographic_level: Census tract
+license: Statistics Canada Open Licence
+license_url: https://www.statcan.gc.ca/en/terms-conditions/open-licence
+coverage_note: The processed result is Canada-wide Census Tract data, not a Toronto City subset.
