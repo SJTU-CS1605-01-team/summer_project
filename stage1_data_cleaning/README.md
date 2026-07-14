@@ -13,18 +13,19 @@
 | 3 | 收集10项CT级指标 | 已完成 | `Toronto_data/indicator_inventory.xlsx`、`Toronto_data/processed/canada_ct_10_indicators_2021.csv` |
 | 4 | Toronto City筛选与几何检查 | 已完成 | `Toronto_data/stage4_qgis_quality_report.md`、`Toronto_data/processed/toronto_stage4.gpkg` |
 | 5 | DGUID连接与匹配率 | 数据成果通过；展示截图仍有小幅返工建议 | `Toronto_data/stage5_join_quality_report.md` |
-| 6 | 派生指标与专题地图 | 文件已生成，但独立视觉检查未通过；两张正式图均需返工 | `Toronto_data/stage6_map_report.md`、`stage5_6_current_status.md`、`maps/` |
+| 6 | 派生指标与专题地图 | 已完成并通过独立文件与视觉检查 | `Toronto_data/stage6_map_report.md`、`stage5_6_current_status.md`、`maps/` |
 
 ### 对队友阶段4—6成果的独立检查（2026-07-14）
 
 - 阶段4通过数据检查：`toronto_stage4.gpkg`含1个Toronto City边界和585个Toronto CT。
 - 阶段5通过数据检查：指标CSV为585条唯一DGUID；连接GeoPackage为585条，`join_status='matched'`和`join_matched=1`均为585，匹配率100.00%。现有报告指出部分QGIS展示截图仍需重截。
-- 阶段6的PNG/PDF和QGZ文件可以读取，但**不能作为最终验收地图直接使用**：
-  - `toronto_population_density_2021.png`只显示城市轮廓，没有显示585个CT的人口密度分级填色，副标题仍写`Derived indicator`；
-  - `toronto_low_income_2020.png`有CT分级填色，但标题、图例标题、单位/分级说明、来源、比例尺和底部文字存在明显截断；
-  - `toronto_stage5_6.qgz`内部仍包含`pop_density_calc`配置，尚未完整保存正式人口密度字段修改。
+- 阶段6已修正并重新导出：
+  - `toronto_population_density_2021.png/.pdf`使用官方`population_density_km2`，585个CT按5级Natural Breaks（Jenks）填色；
+  - `toronto_low_income_2020.png/.pdf`使用`low_income_lim_at_pct`，583个有效值和2个灰色No data均保留；
+  - 两张正式PNG均为3507×2480（300 DPI），标题、图例、比例尺、北箭头、来源、年份和CRS说明通过视觉检查；
+  - `toronto_stage5_6.qgz`已保存相对数据路径、正式人口密度字段和正确副标题，可由QGIS LTR 3.44.12读取并重新导出。
 
-因此当前准确表述是：**阶段4完成；阶段5数据完成、展示证据待小修；阶段6数据与草图已生成，但两张正式地图均未通过最终视觉验收。**
+因此当前准确表述是：**阶段4完成；阶段5数据完成、展示证据仍有小幅优化建议；阶段6工程和两张正式专题地图已通过最终验收。**
 
 ## 阶段1—3答辩问题整理
 
@@ -122,8 +123,8 @@ stage1_data_cleaning/
 
 - 阶段4使用Toronto City的2021 CSD ID `3520005`和`are within`规则获得585个市内CT。
 - 阶段5以文本型DGUID完成585对585的一对一连接，匹配率100.00%。
-- 阶段6计算`area_km2_calc`和`pop_density_calc`；正式人口密度图建议使用官方`population_density_km2`字段。
+- 阶段6计算`area_km2_calc`和`pop_density_calc`作为派生指标证据；正式人口密度图已使用官方`population_density_km2`字段。
 - 阶段4和阶段5的数据检查结果已与实际GeoPackage/CSV一致。
-- 阶段6须重新在QGIS布局管理器中检查图层可见性和文字框尺寸，再导出两张正式PNG/PDF；当前文件不可直接用于最终答辩。
+- 阶段6两张正式PNG/PDF已在QGIS LTR 3.44.12中顺序导出并完成视觉检查，可用于答辩；`qgis/fix_stage6_project.py`记录了工程修复步骤。
 
 更完整的阶段1—3问题答案及证据路径见`Toronto_data/STAGE1_3_RESPONSIBILITY_ANSWERS.txt`。
