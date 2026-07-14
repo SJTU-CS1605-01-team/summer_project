@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Toronto Census Tract 数据收集与 QGIS 阶段汇报</title>
+<style>
+:root{
+  --navy:#0f2f68;--blue:#2f6fb3;--sky:#eaf4fc;--green:#2f8f5b;
+  --orange:#e58b2a;--red:#c7524f;--ink:#24364b;--muted:#6c7d90;
+  --line:#d8e4f0;--shadow:0 18px 50px rgba(18,58,115,.14);
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;width:100%;height:100%;
+  font-family:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC",Arial,sans-serif;
+  background:#111;overflow:hidden;
+}
+.slide{
+  position:absolute;inset:0;display:none;width:100vw;height:100vh;
+  padding:5.4vh 5.4vw 6.8vh;
+  background:linear-gradient(135deg,#f8fbff 0%,#eaf3fb 54%,#dbeaf8 100%);
+  color:var(--ink);overflow:hidden;
+}
+.slide.active{display:block}
+.kicker{color:var(--blue);font-size:.95vw;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2.1vh}
+.title{margin:.3vh 0 0;color:var(--navy);font-size:2.65vw;line-height:1.13;font-weight:900;letter-spacing:-.025em}
+.sub{color:#63788f;font-size:.94vw;font-weight:700;text-align:right}
+.footer{position:absolute;left:5.4vw;right:5.4vw;bottom:1.9vh;display:flex;justify-content:space-between;color:#7890a8;font-size:.78vw}
+.glass{background:rgba(255,255,255,.80);border:1px solid rgba(255,255,255,.90);box-shadow:var(--shadow);backdrop-filter:blur(16px);border-radius:24px}
+.card{padding:1.05vw 1.2vw}
+.card h2{margin:0 0 .65vh;color:var(--navy);font-size:1.05vw}
+.card h3{margin:.1vh 0 .4vh;color:var(--navy);font-size:.92vw}
+.card p,.card li{margin:.22vh 0;color:#40566e;font-size:.82vw;line-height:1.42}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.8vw;align-items:center;height:73vh}
+.grid55{display:grid;grid-template-columns:1.08fr .92fr;gap:1.8vw;align-items:center;height:73vh}
+.grid64{display:grid;grid-template-columns:1.2fr .8fr;gap:1.8vw;align-items:center;height:73vh}
+.note{padding:.78vw .95vw;border-radius:13px;background:#eef6ff;border-left:5px solid var(--blue);color:#2f5077;font-size:.8vw;font-weight:800;line-height:1.42}
+.warnbox{padding:.78vw .95vw;border-radius:13px;background:#fff8ea;border:1px dashed var(--orange);color:#74541c;font-size:.78vw;font-weight:700;line-height:1.42}
+.placeholder{padding:1vw;border-radius:18px;background:#f3f5f8;border:2px dashed #b7c3cf;color:#6a7480;text-align:center;font-weight:900;font-size:1.45vw;min-height:25vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.placeholder small{display:block;margin-top:.6vh;font-size:.78vw;color:#87919c;font-weight:700;line-height:1.35}
+.controls{position:fixed;right:18px;bottom:14px;z-index:50;display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.35);border-radius:14px;padding:8px 10px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.controls button{border:0;border-radius:10px;background:#123a73;color:white;padding:8px 12px;font-size:14px;cursor:pointer}
+.controls span{font-size:14px;color:#123a73;font-weight:700;padding:0 6px}
+.badge{display:inline-block;padding:.38vw .65vw;border-radius:999px;background:rgba(255,255,255,.72);border:1px solid rgba(47,111,179,.18);color:#173e71;font-weight:800;font-size:.76vw;margin:.16vw}
+.badge.green{background:#eef9f2;color:#226940;border-color:#b7dec4}
+.badge.orange{background:#fff8ea;color:#7d571a;border-color:#f0ca8c}
+table{width:100%;border-collapse:collapse;border-radius:14px;overflow:hidden}
+th{background:#123a73;color:white;padding:.52vw;font-size:.76vw;text-align:left}
+td{padding:.45vw .52vw;border-bottom:1px solid #e3edf5;font-size:.72vw;line-height:1.28;color:#354d65}
+tr:nth-child(even) td{background:#f8fbfe}
+.flow{display:flex;align-items:center;gap:.45vw}
+.step{flex:1;padding:.7vw .45vw;border-radius:14px;background:rgba(255,255,255,.84);border:1px solid #d8e6f2;text-align:center;color:var(--navy);font-size:.76vw;font-weight:900;min-height:8.8vh;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.step small{display:block;color:#6a7f93;font-size:.66vw;font-weight:700;margin-top:.2vh;line-height:1.25}
+.arr{color:var(--blue);font-weight:900}
+.cover{padding:6.8vh 6vw 6vh}
+.cover-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:3vw;align-items:center;height:100%}
+.cover .title{font-size:4vw}
+.subtitle{margin-top:2vh;color:#315d8d;font-size:1.45vw;font-weight:800}
+.meta{margin-top:2.4vh;color:#526f8a;font-size:1vw;line-height:1.8}
+.sky-card{height:65vh;border-radius:34px;background:radial-gradient(circle at 78% 16%,rgba(104,176,236,.28),transparent 24%),linear-gradient(180deg,#f9fdff,#eaf5fd 58%,#d9eaf7);border:1px solid rgba(255,255,255,.92);box-shadow:0 22px 55px rgba(18,58,115,.18);overflow:hidden;position:relative}
+.sun{position:absolute;right:11%;top:9%;width:8vw;height:8vw;border-radius:50%;background:radial-gradient(circle,#fff,#d7ecfb 58%,transparent 74%)}
+.skyline{position:absolute;left:6%;right:6%;bottom:6%;height:42vh;display:flex;align-items:flex-end;gap:.42vw}
+.b{flex:1;border-radius:5px 5px 0 0;background:linear-gradient(180deg,#79a8d3,#315f8c 45%,#173f6e);position:relative}
+.b:after{content:"";position:absolute;left:18%;right:18%;top:12%;bottom:8%;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.18) 0 2px,transparent 2px 12px)}
+.cn{position:relative;width:1.05vw;height:31vh;background:#173f6e;border-radius:999px 999px 0 0;margin:0 .35vw}
+.cn:before{content:"";position:absolute;left:50%;top:-8.2vh;width:.22vw;height:8.5vh;background:#173f6e;transform:translateX(-50%)}
+.cn:after{content:"";position:absolute;left:50%;top:7vh;width:4vw;height:.86vw;background:#173f6e;border-radius:999px;transform:translateX(-50%)}
+.water{position:absolute;left:0;right:0;bottom:0;height:12vh;background:linear-gradient(180deg,rgba(120,183,226,.36),rgba(71,135,183,.58)),repeating-linear-gradient(0deg,rgba(255,255,255,.18) 0 2px,transparent 2px 12px)}
+.chip{position:absolute;top:6%;left:6%;padding:.6vw 1vw;border-radius:999px;background:rgba(255,255,255,.74);border:1px solid rgba(47,111,179,.15);color:#173e71;font-size:.9vw;font-weight:800}
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8vw}
+.metric{padding:.9vw;border-radius:16px;background:rgba(255,255,255,.84);border:1px solid #d8e6f2;text-align:center}
+.metric b{display:block;color:var(--navy);font-size:1.25vw;margin-bottom:.2vh}
+.metric span{font-size:.72vw;color:#60738a;font-weight:700}
+.qnum{display:inline-block;background:#123a73;color:#fff;border-radius:999px;padding:.2vw .55vw;font-size:.7vw;font-weight:900;margin-right:.4vw}
+.repo{font-family:Consolas,monospace;background:#10253d;color:#dcecff;border-radius:16px;padding:1vw;font-size:.72vw;line-height:1.45}
+.mapbox{min-height:43vh;border-radius:18px;border:2px dashed #b7c3cf;background:#f3f5f8;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#7a8490;text-align:center;font-weight:900;font-size:1.5vw}
+.mapbox small{font-size:.78vw;margin-top:.6vh;line-height:1.4;font-weight:700}
+@media print{body{overflow:visible;background:white}.slide{display:block!important;position:relative;page-break-after:always;width:13.333in;height:7.5in}.controls{display:none}}
+</style>
+
+<style>
+/* 微调版：整体字号提升，保留原版式与页面下端留白 */
+.kicker{font-size:1.08vw}
+.title{font-size:2.82vw}
+.sub{font-size:1.06vw}
+.footer{font-size:.86vw}
+.card h2{font-size:1.18vw}
+.card h3{font-size:1.04vw}
+.card p,.card li{font-size:.92vw;line-height:1.48}
+.note{font-size:.90vw;line-height:1.48}
+.warnbox{font-size:.88vw;line-height:1.48}
+.badge{font-size:.84vw}
+th{font-size:.84vw;padding:.56vw}
+td{font-size:.80vw;padding:.48vw .55vw;line-height:1.32}
+.step{font-size:.84vw}
+.step small{font-size:.73vw}
+.metric b{font-size:1.35vw}
+.metric span{font-size:.80vw}
+.qnum{font-size:.78vw}
+.cover .title{font-size:4.15vw}
+.subtitle{font-size:1.55vw}
+.meta{font-size:1.08vw}
+.chip{font-size:.98vw}
+.repo{font-size:.80vw}
+.media-frame{
+  width:100%;height:100%;min-height:42vh;
+  border-radius:20px;overflow:hidden;background:#eef3f7;
+  border:1px solid #d4e0eb;box-shadow:0 14px 36px rgba(18,58,115,.14);
+  display:flex;align-items:center;justify-content:center;
+}
+.media-frame img{width:100%;height:100%;object-fit:contain;display:block;background:white}
+.media-frame.cover-img img{object-fit:cover}
+.media-caption{margin-top:.55vh;text-align:center;color:#687d91;font-size:.76vw;font-weight:700}
+.dual-media{display:grid;grid-template-columns:1fr 1fr;gap:.7vw;height:48vh}
+.dual-media .media-frame{min-height:0}
+.compact-media{height:29vh;min-height:0}
+.map-frame{height:64vh;min-height:0}
+@media (max-aspect-ratio: 4/3){
+  .card p,.card li{font-size:1.02vw}
+  td{font-size:.86vw}
+}
+</style>
+
+
+<style>
+/* 页面4/7/8图片放大 */
+.page8-layout{
+    display:grid;
+    grid-template-columns:1.28fr .72fr;
+    gap:1.15vw;
+    align-items:start;
+}
+.page4-layout .media-frame,
+.page7-layout .media-frame,
+.page8-layout .media-frame{
+height:60vh!important;
+}
+.page8-layout .dual-media{
+grid-template-columns:1fr;
+height:60vh;
+}
+.page8-layout .dual-media .media-frame:first-child{height:36vh!important;}
+.page8-layout .dual-media .media-frame:last-child{height:22vh!important;}
+.media-frame img{padding:6px;}
+</style>
+
+<style>
+/* v3：进一步提升图片可读性，重点优化 P4 / P5 / P7 / P8 / P9 / P10 */
+
+/* 图片本身不再额外留白，尽可能利用容器面积 */
+.media-frame{
+  padding:0;
+}
+.media-frame img{
+  padding:0!important;
+}
+
+/* Page 4：压缩表格，放大官方下载页截图 */
+.page4-source-layout{
+  display:grid;
+  grid-template-columns:.78fr 1.22fr;
+  gap:1.25vw;
+  align-items:stretch;
+  height:73vh;
+}
+.page4-source-layout .source-image-card{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+}
+.page4-source-layout .source-image-card .media-frame{
+  flex:1;
+  min-height:0;
+  height:auto!important;
+}
+
+/* Page 5：QGIS 截图为主，右侧检查表压缩 */
+.page5-layout{
+  display:grid;
+  grid-template-columns:1.28fr .72fr;
+  gap:1.25vw;
+  align-items:stretch;
+  height:73vh;
+}
+.page5-layout .dual-media{
+  height:61vh;
+  gap:.65vw;
+}
+.page5-layout .glass.card{
+  height:auto;
+}
+
+/* Page 7：指标表截图占主要空间 */
+.page7-layout{
+  grid-template-columns:1.48fr .52fr!important;
+  gap:1.15vw!important;
+}
+.page7-layout .media-frame{
+  height:64vh!important;
+}
+.page7-layout .flow{
+  gap:.25vw;
+}
+.page7-layout .step{
+  padding:.55vw .3vw;
+  min-height:7.8vh;
+  font-size:.76vw;
+}
+.page7-layout .step small{
+  font-size:.66vw;
+}
+
+/* Page 8：双图左右并排，避免上下挤压 */
+.page8-layout{
+  grid-template-columns:1.42fr .58fr!important;
+  gap:1.15vw!important;
+}
+.page8-layout .dual-media{
+  grid-template-columns:1fr 1fr!important;
+  height:61vh!important;
+  gap:.65vw;
+}
+.page8-layout .dual-media .media-frame{
+    width:92%;              /* 新增 */
+    margin:auto;            /* 新增 */
+    height:29.8vh !important;
+}
+.page8-layout .glass.card{
+  align-self:start;
+  height:auto;
+}
+.page8-left{
+    width:82%;
+    margin:0 auto;
+}
+
+/* Page 9 / 10：地图占更大比例 */
+.map-page-layout{
+  display:grid;
+  grid-template-columns:1.4fr .6fr;
+  gap:1.2vw;
+  align-items:stretch;
+  height:73vh;
+}
+.map-page-layout .map-frame{
+  height:66vh;
+}
+.map-page-layout .glass.card{
+  height:auto;
+}
+
+/* 小屏幕兜底 */
+@media (max-aspect-ratio: 4/3){
+  .page4-source-layout,
+  .page5-layout,
+  .page7-layout,
+  .page8-layout,
+  .map-page-layout{
+    gap:.9vw;
+  }
+}
+</style>
+
+
+<style>
+/* v3.1 tweaks */
+
+/* P4 留底部余量 */
+.page4-source-layout{
+  height:69vh !important;
+  margin-bottom:2.2vh;
+}
+
+/* P7 三块上下排布 */
+.page7-layout{
+  display:grid !important;
+  grid-template-columns:1.35fr .65fr !important;
+}
+.page7-layout>div:last-child{
+  display:flex;
+  flex-direction:column;
+  gap:1vh;
+}
+.page7-layout>div:last-child>.glass.card{
+  margin-top:0 !important;
+}
+.page7-layout .flow{
+  flex-direction:column !important;
+  align-items:stretch !important;
+}
+.page7-layout .arr{
+  display:none;
+}
+.page7-layout .step{
+  min-height:5.2vh !important;
+}
+
+/* P8 左侧两张图改为上下 */
+.page8-layout .dual-media{
+  grid-template-columns:1fr !important;
+  grid-template-rows:1fr 1fr !important;
+  height:61vh !important;
+}
+.page8-layout .dual-media .media-frame{
+    width:92%;              /* 新增 */
+    margin:auto;            /* 新增 */
+    height:29.8vh !important;
+}
+</style>
+
+
+<style>
+/* v3.2：P4 / P7 结构与对齐优化 */
+
+/* 全局：多卡片页面尽量共边、等间距 */
+.glass.card,
+.note,
+.warnbox,
+.media-frame{
+  box-sizing:border-box;
+}
+
+/* P4：下载页截图适当缩小，卡片不再贴近页脚 */
+.page4-source-layout{
+  grid-template-columns:.82fr 1.18fr !important;
+  height:68vh !important;
+  align-items:stretch !important;
+  margin-bottom:2.8vh !important;
+}
+.page4-source-layout > .glass.card,
+.page4-source-layout > div{
+  height:100%;
+}
+.page4-source-layout > div:last-child{
+  display:flex;
+  flex-direction:column;
+}
+.page4-source-layout .note{
+  flex:0 0 auto;
+  margin:0;
+}
+.page4-source-layout .source-image-card{
+  flex:1 1 auto;
+  margin-top:1vh !important;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+}
+.page4-source-layout .source-image-card .media-frame{
+  flex:0 0 auto !important;
+  height:43vh !important;
+  min-height:0 !important;
+}
+.page4-source-layout .source-image-card .media-caption{
+  margin-top:.45vh;
+}
+
+/* P7：标题下图片，图片下横向流程，再下连接规则 */
+.page7-layout{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:1vh !important;
+  height:72vh !important;
+}
+.page7-layout > div{
+  width:100%;
+}
+.page7-layout > div:first-child{
+  flex:0 0 auto;
+}
+.page7-layout > div:first-child .media-frame{
+  height:39vh !important;
+  width:100%;
+}
+.page7-layout > div:first-child .media-caption{
+  margin-top:.45vh;
+}
+.page7-layout > div:last-child{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:.9vh !important;
+  width:100%;
+}
+.page7-layout > div:last-child > .glass.card{
+  width:100%;
+  margin-top:0 !important;
+}
+.page7-layout .flow{
+  flex-direction:row !important;
+  align-items:center !important;
+  gap:.45vw !important;
+}
+.page7-layout .arr{
+  display:block !important;
+}
+.page7-layout .step{
+  min-height:7.2vh !important;
+  padding:.55vw .35vw !important;
+  font-size:.78vw !important;
+}
+.page7-layout .step small{
+  font-size:.68vw !important;
+}
+.page7-layout > div:last-child > .glass.card:last-child{
+  padding-top:.85vw;
+  padding-bottom:.85vw;
+}
+.page7-layout > div:last-child > .glass.card:last-child p{
+  margin:.2vh 0;
+  line-height:1.35;
+}
+
+/* P8：左右两列顶部对齐，右侧卡片根据内容自动收缩 */
+.page8-layout{
+  align-items:start !important;
+  grid-template-columns:1.42fr .58fr !important;
+}
+
+.page8-layout > div:first-child{
+  height:auto !important;
+}
+
+.page8-layout > .glass.card{
+  height:auto !important;
+  align-self:start !important;
+}
+
+.page8-layout .dual-media{
+  grid-template-columns:1fr !important;
+  grid-template-rows:1fr 1fr !important;
+  height:61vh !important;
+  gap:.75vh !important;
+}
+
+.page8-layout .dual-media .media-frame{
+    width:92%;              /* 新增 */
+    margin:auto;            /* 新增 */
+    height:29.8vh !important;
+}
+</style>
+
+</head>
+<body>
+
+<section class="slide cover active">
+  <div class="cover-grid">
+    <div>
+      <h1 class="title">Toronto Census Tract<br>数据收集与 QGIS<br>阶段汇报</h1>
+      <div class="meta">国家：加拿大｜城市：多伦多｜空间单元：2021 Census Tract<br>CS1605 Summer Project｜第 5 组｜2026 年 7 月</div>
+      <div style="margin-top:2.5vh"><span class="badge">Boundary 2021</span><span class="badge">Indicators 2021</span><span class="badge">DGUID</span><span class="badge green">QGIS 已完成</span></div>
+    </div>
+    <div class="sky-card">
+      <div class="sun"></div><div class="chip">Toronto · Census Tract · QGIS</div>
+      <div class="skyline"><div class="b" style="height:40%"></div><div class="b" style="height:58%"></div><div class="b" style="height:46%"></div><div class="b" style="height:74%"></div><div class="b" style="height:63%"></div><div class="cn"></div><div class="b" style="height:54%"></div><div class="b" style="height:79%"></div><div class="b" style="height:49%"></div><div class="b" style="height:68%"></div><div class="b" style="height:57%"></div></div><div class="water"></div>
+    </div>
+  </div>
+  <div class="footer"><span>页面 1：国家、城市与小组信息</span><span>01 / 12</span></div>
+</section>
+
+<section class="slide">
+  <div class="header"><div><div class="kicker">Page 2</div><h1 class="title">Tract-like 单元介绍</h1></div><div class="sub">官方名称、性质、覆盖、更新、唯一编码</div></div>
+  <div class="grid55">
+    <div class="glass card">
+      <table>
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>官方名称</td><td>2021 Census tract（CT）</td></tr>
+        <tr><td>发布机构</td><td>Statistics Canada</td></tr>
+        <tr><td>单元性质</td><td>普查统计区 / 统计地理单元，不是行政区</td></tr>
+        <tr><td>覆盖范围</td><td>设置在 Census Metropolitan Areas 及符合条件的 Census Agglomerations，不覆盖加拿大全部国土</td></tr>
+        <tr><td>典型人口规模</td><td>通常约 2,500–7,500 人，推荐平均约 5,000 人</td></tr>
+        <tr><td>唯一编码</td><td>DGUID；备用编码 CTUID</td></tr>
+        <tr><td>统计用途</td><td>承载人口、收入、住房、教育、就业等经济社会指标</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="note"><span class="qnum">Q1</span>加拿大最合适的 tract-like 单元是 2021 Census Tract，因为它比 CMA、CSD、CD 更适合描述多伦多城市内部差异。</div>
+      <div class="warnbox" style="margin-top:1.2vh"><span class="qnum">Q2</span>CT 不是行政区，也不是全国连续覆盖；多伦多属于有 CT 覆盖的 CMA，但多伦多 CMA 不等于多伦多 City。</div>
+      <div class="glass card" style="margin-top:1.2vh">
+        <h2>官方定义页面证据</h2>
+        <div class="media-frame compact-media">
+          <img loading="eager" src="https://raw.githubusercontent.com/SJTU-CS1605-01-team/summer_project/second/stage1_data_cleaning/Toronto_data/CT_definition/definition_page.png" alt="Statistics Canada Census Tract definition page">
+        </div>
+        <div class="media-caption">Statistics Canada · Census tract 官方定义页面</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>页面 2：Tract-like 单元介绍</span><span>02 / 12</span></div>
+</section>
+
+<section class="slide">
+  <div class="header"><div><div class="kicker">Page 3</div><h1 class="title">与美国 Census Tract 的相似性</h1></div><div class="sub">人口/面积尺度、用途、稳定性、指标丰富度</div></div>
+  <div class="grid2">
+    <div class="glass card">
+      <table>
+        <tr><th>比较维度</th><th>Canada CT</th><th>美国 Census Tract 参照</th></tr>
+        <tr><td>单元性质</td><td>统计 / 普查单元</td><td>统计单元</td></tr>
+        <tr><td>平均人口</td><td>通常数千人</td><td>通常数千人</td></tr>
+        <tr><td>城市内部尺度</td><td>小尺度，适合城市内部比较</td><td>城市内部较小</td></tr>
+        <tr><td>边界稳定性</td><td>相对稳定</td><td>较高</td></tr>
+        <tr><td>指标丰富度</td><td>高，Census Profile 支持</td><td>高</td></tr>
+        <tr><td>唯一编码</td><td>DGUID / CTUID</td><td>有唯一编码</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="metric-grid">
+        <div class="metric"><b>高</b><span>相似度判断</span></div>
+        <div class="metric"><b>2021</b><span>推荐年份</span></div>
+        <div class="metric"><b>DGUID</b><span>连接字段</span></div>
+        <div class="metric"><b>CT</b><span>推荐单元</span></div>
+      </div>
+      <div class="note" style="margin-top:1.2vh">汇报结论：推荐使用 Statistics Canada 的 2021 Census Tract。它在统计用途、稳定性、人口尺度和指标承载能力上与美国 Census Tract 高度相似。</div>
+    </div>
+  </div>
+  <div class="footer"><span>页面 3：与 Census Tract 的相似性</span><span>03 / 12</span></div>
+</section>
+
+<section class="slide">
+  <div class="header"><div><div class="kicker">Page 4</div><h1 class="title">Shapefile 官方来源</h1></div><div class="sub">下载页、文件名、年份、格式、CRS、许可、下载日期</div></div>
+  <div class="page4-source-layout">
+    <div class="glass card">
+      <table>
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>数据机构</td><td>Statistics Canada</td></tr>
+        <tr><td>数据产品</td><td>2021 Census Tract Cartographic Boundary File</td></tr>
+        <tr><td>空间单元与年份</td><td>Census tract，2021</td></tr>
+        <tr><td>文件格式</td><td>Shapefile</td></tr>
+        <tr><td>原始文件名</td><td>lct_000b21a_e.zip</td></tr>
+        <tr><td>CRS</td><td>NAD83 Statistics Canada Lambert，EPSG:3347，metre</td></tr>
+        <tr><td>许可</td><td>Statistics Canada Open Licence</td></tr>
+        <tr><td>下载日期</td><td>2026-07-13</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="note">已做结构检查：.shp、.shx、.dbf、.prj 均存在；DBF 含 6,247 条记录及 CTUID、DGUID、CTNAME、LANDAREA 字段。</div>
+      <div class="glass card source-image-card" style="margin-top:1.2vh">
+        <h2>官方下载页面</h2>
+        <div class="media-frame compact-media">
+          <img loading="eager" src="https://raw.githubusercontent.com/SJTU-CS1605-01-team/summer_project/second/stage1_data_cleaning/Toronto_data/boundary/boundary_download_page.png" alt="Statistics Canada boundary download page">
+        </div>
+        <div class="media-caption">2021 Census Tract Cartographic Boundary File 下载选择页面</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>页面 4：Shapefile 官方来源</span><span>04 / 12</span></div>
+</section>
+
+<section class="slide">
+  <div class="header"><div><div class="kicker">Page 5</div><h1 class="title">QGIS 边界检查与城市裁剪</h1></div><div class="sub">图层面板、属性表、CRS、几何检查、城市筛选方法和单元数量</div></div>
+  <div class="page5-layout">
+    <div>
+      <div class="dual-media">
+        <div class="media-frame"><img loading="eager" src="https://raw.githubusercontent.com/SJTU-CS1605-01-team/summer_project/second/stage1_data_cleaning/Toronto_data/evidence/qgis_check1.png" alt="QGIS boundary check screenshot"></div>
+        <div class="media-frame"><img loading="eager" src="https://raw.githubusercontent.com/SJTU-CS1605-01-team/summer_project/second/stage1_data_cleaning/Toronto_data/evidence/qgis_check4.png" alt="QGIS Toronto clipping screenshot"></div>
+      </div>
+      <div class="media-caption">左：边界与图层检查｜右：Toronto City 空间筛选与结果核验</div>
+    </div>
+    <div>
+      <div class="glass card">
+        <h2>QGIS 检查结果表</h2>
+        <table>
+          <tr><th>检查项</th><th>结果</th><th>说明</th></tr>
+          <tr><td>文件可打开</td><td>是</td><td>全国 CT 边界与 Toronto City 边界均可正常加载</td></tr>
+          <tr><td>CRS 完整</td><td>是</td><td>NAD83 / Statistics Canada Lambert（EPSG:3347）</td></tr>
+          <tr><td>空几何</td><td>0</td><td>未发现空几何</td></tr>
+          <tr><td>无效几何</td><td>0</td><td>几何检查通过</td></tr>
+          <tr><td>重复 ID</td><td>0</td><td>DGUID 与 CTUID 均无重复</td></tr>
+          <tr><td>目标城市筛选</td><td>已完成</td><td>使用 Toronto City 官方 CSD 边界和 are within 规则</td></tr>
+          <tr><td>Toronto City CT 数量</td><td>585</td><td>输出至 processed/toronto_stage4.gpkg</td></tr>
+        </table>
+      </div>
+      <div class="note" style="margin-top:1.2vh">阶段 4 已完成 QGIS 边界检查、几何核验和 Toronto City 空间筛选，最终得到 585 个 Census Tract。</div>
+    </div>
+  </div>
+  <div class="footer"><span>页面 5：QGIS 边界检查与城市裁剪</span><span>05 / 12</span></div>
+</section>
+
+<section class="slide">
+  <div class="header"><div><div class="kicker">Page 6</div><h1 class="title">经济社会指标收集情况</h1></div><div class="sub">至少 8 个指标；年份、空间层级、格式、状态及链接</div></div>
+  <div class="glass card" style="height:73vh">
+    <table>
+      <tr><th>指标</th><th>类别</th><th>年份</th><th>空间层级</th><th>状态</th><th>数据基础</th></tr>
+      <tr><td>population_2021</td><td>人口</td><td>2021</td><td>CT</td><td>available</td><td>100% data</td></tr>
+      <tr><td>population_density_km2</td><td>人口密度</td><td>2021</td><td>CT</td><td>available</td><td>100% data</td></tr>
+      <tr><td>age_65_plus_pct</td><td>年龄结构</td><td>2021</td><td>CT</td><td>available</td><td>100% data</td></tr>
+      <tr><td>average_household_size</td><td>家庭</td><td>2021</td><td>CT</td><td>available</td><td>100% data</td></tr>
+      <tr><td>median_total_income_2020</td><td>收入</td><td>2020</td><td>CT</td><td>available</td><td>100% data</td></tr>
+      <tr><td>low_income_lim_at_pct</td><td>低收入</td><td>2020</td><td>CT</td><td>available</td><td>100% data</td></tr>
+      <tr><td>renter_households_pct</td><td>住房</td><td>2021</td><td>CT</td><td>available</td><td>25% sample</td></tr>
+      <tr><td>shelter_cost_30pct_plus_pct</td><td>住房负担</td><td>2021</td><td>CT</td><td>available</td><td>25% sample</td></tr>
+      <tr><td>bachelor_or_higher_age25_64_pct</td><td>教育</td><td>2021</td><td>CT</td><td>available</td><td>25% sample</td></tr>
+      <tr><td>unemployment_rate_pct</td><td>就业</td><td>2021</td><td>CT</td><td>available</td><td>25% sample</td></tr>
+    </table>
+    <div class="note" style="margin-top:1.1vh">10 个指标均为 CT 级正式发布指标，join_method = direct_join；没有 coarser_level、missing 或 disaggregate。</div>
+  </div>
+  <div class="footer"><span>页面 6：经济社会指标收集情况</span><span>06 / 12</span></div>
+</section>
+
+<section class="slide">
+  <div class="header"><div><div class="kicker">Page 7</div><h1 class="title">实际指标表与 ID 连接逻辑</h1></div><div class="sub">真实数据表截图、连接字段、字段类型、前导零规则</div></div>
+  <div class="page7-layout">
+    <div>
+      <div class="media-frame" style="height:57vh">
+        <img loading="eager" src="https://raw.githubusercontent.com/SJTU-CS1605-01-team/summer_project/second/stage1_data_cleaning/Toronto_data/evidence/indicator_data_sample.png" alt="Indicator data sample">
+      </div>
+      <div class="media-caption">真实指标表样例：DGUID、地理字段与 10 项经济社会指标</div>
+    </div>
+    <div>
+      <div class="glass card">
+        <h2>连接逻辑</h2>
+        <div class="flow">
+          <div class="step">Boundary<br><small>DGUID</small></div><div class="arr">→</div>
+          <div class="step">Text ID<br><small>保留前导零</small></div><div class="arr">→</div>
+          <div class="step">Indicators<br><small>DGUID</small></div><div class="arr">→</div>
+          <div class="step">Direct Join<br><small>不拼接、不下推</small></div>
+        </div>
+      </div>
+      <div class="glass card" style="margin-top:1.2vh">
+        <h2>已确认的连接规则</h2>
+        <p>首选连接字段为 DGUID，边界与指标表均已提供完整 DGUID，不需要另行拼接编码。</p>
+        <p>ALT_GEO_CODE 在 CT 层级对应边界 CTUID，可作辅助核对。</p>
+        <p>DGUID、CTUID / ALT_GEO_CODE 都应按文本处理，避免前导零或格式变化。</p>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>页面 7：实际指标表与 ID 连接逻辑</span><span>07 / 12</span></div>
+</section>
+
+<section class="slide">
+  <div class="header"><div><div class="kicker">Page 8</div><h1 class="title">QGIS 连接结果与质量</h1></div><div class="sub">连接后属性表、匹配率、未匹配原因</div></div>
+  <div class="page8-layout">
+    <div class="page8-left">
+      <div class="dual-media">
+        <div class="media-frame"><img loading="eager" src="https://raw.githubusercontent.com/SJTU-CS1605-01-team/summer_project/second/stage1_data_cleaning/Toronto_data/evidence/stage5_joined_table.png" alt="QGIS joined attribute table"></div>
+        <div class="media-frame"><img loading="eager" src="https://raw.githubusercontent.com/SJTU-CS1605-01-team/summer_project/second/stage1_data_cleaning/Toronto_data/evidence/stage5_match_summary.png" alt="Stage 5 match summary"></div>
+      </div>
+      <div class="media-caption">连接后属性表与 585 / 585 匹配汇总</div>
+    </div>
+    <div class="glass card">
+      <table>
+        <tr><th>统计项</th><th>结果</th><th>说明</th></tr>
+        <tr><td>Toronto City CT 边界总数</td><td>585</td><td>阶段 4 筛选结果</td></tr>
+        <tr><td>指标表记录总数</td><td>585</td><td>585 条唯一 DGUID</td></tr>
+        <tr><td>成功匹配数量</td><td>585</td><td>一对一连接全部成功</td></tr>
+        <tr><td>未匹配边界数量</td><td>0</td><td>无未匹配边界</td></tr>
+        <tr><td>未匹配指标记录数量</td><td>0</td><td>无未匹配指标记录</td></tr>
+        <tr><td>最终匹配率</td><td>100.00%</td><td>585 ÷ 585 × 100%</td></tr>
+        <tr><td>连接关系</td><td>1 : 1</td><td>边界与指标表均以完整文本型 DGUID 连接</td></tr>
+      </table>
+      <div class="note" style="margin-top:1vh">阶段 5 数据成果已通过：585 条边界与 585 条指标记录全部匹配，最终匹配率为 100.00%。</div>
+    </div>
+  </div>
+  <div class="footer"><span>页面 8：QGIS 连接结果与质量</span><span>08 / 12</span></div>
+</section>
+
+<section class="slide">
+  <div class="header"><div><div class="kicker">Page 9</div><h1 class="title">专题地图 1：人口密度</h1></div><div class="sub">Toronto 2021 Population Density</div></div>
+  <div class="map-page-layout">
+    <div>
+      <div class="media-frame map-frame">
+        <img loading="eager" src="https://raw.githubusercontent.com/SJTU-CS1605-01-team/summer_project/second/stage1_data_cleaning/maps/toronto_population_density_2021.png" alt="Toronto 2021 Population Density map">
+      </div>
+      <div class="media-caption">QGIS 正式输出 · 3507 × 2480 · 300 DPI</div>
+    </div>
+    <div>
+      <div class="glass card">
+        <h2>地图说明模板</h2>
+        <table>
+          <tr><th>项目</th><th>填写内容</th></tr>
+          <tr><td>地图主题</td><td>Toronto 2021 Population Density</td></tr>
+          <tr><td>指标字段</td><td>population_density_km2</td></tr>
+          <tr><td>指标年份</td><td>2021</td></tr>
+          <tr><td>派生方式</td><td>使用 Census Profile 官方人口密度字段</td></tr>
+          <tr><td>分级方法</td><td>按阶段 6 地图报告中的正式分级设置</td></tr>
+          <tr><td>缺失值处理</td><td>585 个 CT 均参与正式分级</td></tr>
+          <tr><td>空间现象</td><td>高密度区域集中于中心城区及主要交通走廊，外围总体较低</td></tr>
+        </table>
+      </div>
+      <div class="note" style="margin-top:1.2vh">正式地图已完成并通过视觉检查；汇报时插入地图成品并解释主要空间分布。</div>
+    </div>
+  </div>
+  <div class="footer"><span>页面 9：专题地图 1</span><span>09 / 12</span></div>
+</section>
+
+<section class="slide">
+  <div class="header"><div><div class="kicker">Page 10</div><h1 class="title">专题地图 2：低收入比例</h1></div><div class="sub">Toronto 2020 Low Income Rate</div></div>
+  <div class="map-page-layout">
+    <div>
+      <div class="media-frame map-frame">
+        <img loading="eager" src="https://raw.githubusercontent.com/SJTU-CS1605-01-team/summer_project/second/stage1_data_cleaning/maps/toronto_low_income_2020.png" alt="Toronto 2020 Low Income Rate map">
+      </div>
+      <div class="media-caption">QGIS 正式输出 · 3507 × 2480 · 300 DPI</div>
+    </div>
+    <div>
+      <div class="glass card">
+        <h2>地图说明模板</h2>
+        <table>
+          <tr><th>项目</th><th>填写内容</th></tr>
+          <tr><td>地图主题</td><td>Toronto 2020 Low Income Rate</td></tr>
+          <tr><td>指标字段</td><td>low_income_lim_at_pct</td></tr>
+          <tr><td>指标年份</td><td>2020（按 2021 CT 体系发布）</td></tr>
+          <tr><td>分级方法</td><td>按阶段 6 地图报告中的正式分级设置</td></tr>
+          <tr><td>样本类型</td><td>100% data / 25% sample data</td></tr>
+          <tr><td>缺失值处理</td><td>583 个有效值；2 个 No data 以灰色保留</td></tr>
+          <tr><td>空间现象</td><td>根据正式地图补充低收入集中区、空间聚集和城市内部差异</td></tr>
+        </table>
+      </div>
+      <div class="note" style="margin-top:1.2vh">正式地图已完成；汇报时重点解释低收入比例的空间聚集，而不仅是展示分级颜色。</div>
+    </div>
+  </div>
+  <div class="footer"><span>页面 10：专题地图 2</span><span>10 / 12</span></div>
+</section>
+
+<section class="slide">
+  <div class="header"><div><div class="kicker">Page 11</div><h1 class="title">问题、限制与后续计划</h1></div><div class="sub">年份不一致、尺度差异、缺失指标、待完成任务</div></div>
+  <div class="grid2">
+    <div class="glass card">
+      <h2>当前困难</h2>
+      <table>
+        <tr><th>困难</th><th>说明</th></tr>
+        <tr><td>2.63GB 原始长表</td><td>必须流式处理，不能依赖 Excel 直接打开</td></tr>
+        <tr><td>Toronto CMA ≠ Toronto City</td><td>阶段 4 已使用 Toronto City 官方 CSD 边界完成筛选</td></tr>
+        <tr><td>CT 非全国连续覆盖</td><td>CT 只设置在 CMA 和符合条件 CA</td></tr>
+        <tr><td>25% sample data</td><td>住房、教育、就业等指标解读需谨慎</td></tr>
+        <tr><td>官方抑制 / 不适用</td><td>少量 CT 会有缺失值</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="glass card">
+        <h2>后续完善方向</h2>
+        <div class="flow" style="flex-direction:column;align-items:stretch">
+          <div class="step">1. 补充更清晰的 QGIS 过程截图</div>
+          <div class="step">2. 在汇报中插入两张正式专题地图</div>
+          <div class="step">3. 根据地图补充空间现象解释</div>
+          <div class="step">4. 继续扩展通勤、语言、移民等指标</div>
+          <div class="step">5. 明确 AI 任务、标签和验证策略</div>
+          <div class="step">6. 按教师标准确认最终 A/B/C/D 评级</div>
+        </div>
+      </div>
+      <div class="note" style="margin-top:1vh">后续可扩展指标：通勤方式、移民身份、语言、职业结构、住房类型、家庭结构等，但必须逐项记录 ID、样本类型、缺失和年份。</div>
+    </div>
+  </div>
+  <div class="footer"><span>页面 11：问题、限制与后续计划</span><span>11 / 12</span></div>
+</section>
+
+<section class="slide">
+  <div class="header"><div><div class="kicker">Page 12</div><h1 class="title">最终可行性结论</h1></div><div class="sub">A/B/C/D 等级、已确认指标数、可连接数、AI 建模条件</div></div>
+  <div class="grid2">
+    <div class="glass card">
+      <h2>当前可确认</h2>
+      <p><span class="badge green">已确认指标数：10</span></p>
+      <p><span class="badge green">空间层级：Census Tract</span></p>
+      <p><span class="badge green">连接字段：DGUID</span></p>
+      <p><span class="badge green">阶段结论：Stage 1–6 已完成</span></p>
+      <div class="note" style="margin-top:1vh">研究单元、官方边界、10 个 CT 级指标、Toronto City 筛选、属性连接和两张正式专题地图均已完成。</div>
+    </div>
+    <div class="glass card">
+      <h2>最终成果总结</h2>
+      <table>
+        <tr><th>项目</th><th>当前填写</th></tr>
+        <tr><td>Toronto City CT 数量</td><td>585</td></tr>
+        <tr><td>成功连接数</td><td>585</td></tr>
+        <tr><td>连接匹配率</td><td>100.00%</td></tr>
+        <tr><td>正式地图数量</td><td>2</td></tr>
+        <tr><td>可行性等级</td><td>A / B（按教师标准最终确认）</td></tr>
+        <tr><td>是否适合进入 AI 阶段</td><td>数据基础具备；建模方案仍需设计</td></tr>
+      </table>
+      <div class="warnbox" style="margin-top:1vh">准确结论：数据基础已具备进入 AI 设计阶段的条件，但真正训练模型前仍需明确任务、标签、样本量、缺失机制和验证策略。</div>
+    </div>
+  </div>
+  <div class="footer"><span>页面 12：最终可行性结论</span><span>12 / 12</span></div>
+</section>
+
+<div class="controls">
+  <button onclick="prev()">上一页</button>
+  <span id="page">1 / 12</span>
+  <button onclick="next()">下一页</button>
+  <button onclick="window.print()">打印 / 导出 PDF</button>
+</div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+let idx=0;
+function show(i){
+  idx=Math.max(0,Math.min(slides.length-1,i));
+  slides.forEach((s,j)=>s.classList.toggle('active',j===idx));
+  document.getElementById('page').textContent=(idx+1)+' / '+slides.length;
+}
+function next(){show(idx+1)}
+function prev(){show(idx-1)}
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight','PageDown',' '].includes(e.key))next();
+  if(['ArrowLeft','PageUp'].includes(e.key))prev();
+  if(e.key==='Home')show(0);
+  if(e.key==='End')show(slides.length-1);
+});
+</script>
+
+<script>
+document.querySelectorAll('.media-frame img').forEach(img=>{
+  img.addEventListener('error',()=>{
+    const box=img.parentElement;
+    box.innerHTML='<div style="padding:2vw;text-align:center;color:#6f7f8f;font-weight:800;line-height:1.5">图片暂未加载<br><small>请保持联网后重新打开，或将仓库图片下载到本地。</small></div>';
+  });
+});
+</script>
+
+</body>
+</html>
