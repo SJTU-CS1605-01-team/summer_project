@@ -1,12 +1,14 @@
 # Toronto Census Tract数据准备（阶段1—3）
 
+> **文档定位：**本README专门记录阶段1—3交付物及其生成时的职责边界。团队`second`分支现已包含阶段4—6文件；跨阶段总览见上一级`../README.md`，阶段4、5、6的最新验收状态分别见`stage4_qgis_quality_report.md`、`stage5_join_quality_report.md`和`stage5_6_current_status.md`。
+
 ## 1. 项目目的与当前范围
 
-本目录为Toronto城市内部社会经济空间分析准备官方tract-like边界和Census Tract指标。当前只完成阶段1—3：确定研究单元、整理官方边界及元数据、筛选并说明10个CT层级指标。
+本文记录Toronto城市内部社会经济空间分析的阶段1—3成果：确定研究单元、整理官方边界及元数据、筛选并说明10个CT层级指标。
 
 本阶段不筛选或裁剪Toronto City，不操作QGIS，不连接边界与指标，不计算匹配率，不制作专题地图，也不评价AI或神经网络应用。
 
-> **重要：`canada_ct_10_indicators_2021.csv`覆盖加拿大所有Census Tract，不是Toronto City最终子集。不得仅按535前缀将Toronto CMA视为Toronto City。下一阶段必须使用Toronto City市界获得市内DGUID清单，再进一步筛选。**
+> **重要：`canada_ct_10_indicators_2021.csv`覆盖加拿大所有Census Tract，不是Toronto City最终子集。不得仅按535前缀将Toronto CMA视为Toronto City。阶段4已另行使用Toronto City市界获得585个市内CT；不得反向把该城市结果冒充阶段3全国宽表。**
 
 ## 2. tract-like选择结论
 
