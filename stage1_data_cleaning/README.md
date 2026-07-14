@@ -127,4 +127,4 @@ stage1_data_cleaning/
 - 阶段4和阶段5的数据检查结果已与实际GeoPackage/CSV一致。
 - 阶段6两张正式PNG/PDF已在QGIS LTR 3.44.12中顺序导出并完成视觉检查，可用于答辩；`qgis/fix_stage6_project.py`记录了工程修复步骤。
 
-更完整的阶段1—3问题答案及证据路径见`Toronto_data/STAGE1_3_RESPONSIBILITY_ANSWERS.txt`。
+完整11个答辩问题的答案、职责边界和证据路径见`Toronto_data/STAGE1_3_RESPONSIBILITY_ANSWERS.txt`；README不重复收录第7—11题正文。
